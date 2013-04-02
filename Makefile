@@ -5,7 +5,11 @@ TAGS=ctags -R
 raidsim: main.o disk.o disk-array.o raid0.o
 	$(CC) main.o disk.o disk-array.o raid0.o -o raidsim
 	$(TAGS)
-
+	
+debug: main.o disk.o disk-array.o raid0.o
+	$(CC) main.o disk.o disk-array.o raid0.o -d -o raidsim
+	$(TAGS)
+	
 main.o: main.c
 	$(CC) $(FLAGS) main.c -o main.o
 
