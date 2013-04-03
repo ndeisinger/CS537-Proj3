@@ -1,5 +1,7 @@
 #include "util.h"
 #include "raid0.h"
+#include "raid10.h"
+#include "raid4.h"
 
 int verbose;
 diskInfo info; //command line info
@@ -22,6 +24,7 @@ int main(int argc, char * argv[])
     info.numStrips = -1;
     info.level = -1;
     char * tracefile = NULL;
+    failedDisk = -1; //Used in RAID4/RAID5
 
     struct option long_options[] = 
     {
@@ -137,19 +140,30 @@ int main(int argc, char * argv[])
             read_f = r0_read;
             write_f = r0_write;
             recover_f = r0_recover;
-        break;
+            break;
+        case(10):
+            read_f = r10_read;
+            write_f = r10_write;
+            recover_f = r10_recover;
+            break;
+        case(4):
+            read_f = r4_read;
+            write_f = r4_write;
+            recover_f = r4_recover;
+            break;
         default:
-        break;
+            printf("Invalid level.  How did we even get here?\n");
+            exit(1);
     }
     
     //loops through each line in the trace file
     //parsing the line and making calls 
     
-    //This buffer is made for use with the commands WRITE <LBA> 5 <VAL> and READ <LBA> 5.
+    //This buffer is made for use with _matching_ write commands.
     //We write to here as well as the write buffer so we can compare the data we read back.
+    //This only works with the most recent write.
     #ifdef DEBUG
-        char knownval[BLOCK_SIZE * 5];
-        memset(knownval, 0, BLOCK_SIZE * 5);
+        char * knownval = NULL;
     #endif
     
     
@@ -171,13 +185,16 @@ int main(int argc, char * argv[])
             // Ensure that the known value we wrote matches what we read back.
                 for (int i = 0; i < BLOCK_SIZE * size; i++)
                 {
-                    if (knownval[i] != readbuf[i])
-                    {
-                        printf("Diverging index: %i\n", i);
-                        //exit(1);
+                if (knownval)
+                {
+                        if (knownval[i] != readbuf[i])
+                        {
+                            printf("Diverging index: %i\n", i);
+                            printf("knownVal: %c\n", knownval[i]);
+                            printf("read val: %c\n", readbuf[i]);
+                            //exit(1);
+                        }
                     }
-                    printf("knownVal: %c\n", knownval[i]);
-                    printf("read val: %c\n", readbuf[i]);
                 }
             #endif
         }
@@ -189,21 +206,28 @@ int main(int argc, char * argv[])
             strtok(buffer, " ");
             int lba = atoi(strtok(NULL, " "));
             int size = atoi(strtok(NULL, " "));
-            char val[4];
+            int val = atoi(strtok(NULL, " "));
+            #ifdef DEBUG
+                printf("lba: %i/%p, size: %i/%p, val: %i/%p\n", lba, &lba, size, &size, val, &val);
+                if (knownval) free(knownval);
+                knownval = (char *) malloc(BLOCK_SIZE * size);
+                memset(knownval, 0, BLOCK_SIZE * size);
+            #endif
             //Copy 4 bytes from tracefile into a buffer
-            memcpy(val, strtok(NULL, " "), 4*sizeof(char));
             //make repeated array of that value for writing
+            //char writebuf[BLOCK_SIZE * size];
             char writebuf[BLOCK_SIZE * size];
             //TODO: NOTE: We could use a buffer of just one block, repeated.
             for (int i = 0; i < BLOCK_SIZE * size; i++)
             {
-                writebuf[i] = val[i % 4]; //TODO: Could be more efficient
+                writebuf[i] = ((char *) &val)[(i % 4)]; //TODO: Could be more efficient
             #ifdef DEBUG //This is just for testing read, no effect on actual execution
-                knownval[i] = val[i % 4];
+                knownval[i] = ((char *) &val)[(i % 4)];
+                //printf("i: %i, &i: %p, &writebuf[i] = %p, &writebuf[0] = %p, writebuf + i = %p, &val = %p\n", i, &i, &writebuf[i], &writebuf[0], writebuf + i, &val);
             #endif
             }
             #ifdef DEBUG
-                printf("lba: %i, size: %i, val: %i\n", lba, size, (int) *val);
+                printf("lba: %i/%p, size: %i/%p, val: %i/%p\n", lba, &lba, size, &size, val, &val);
             #endif
             write_f(lba, size, writebuf);
         }
@@ -211,7 +235,7 @@ int main(int argc, char * argv[])
         {
             //fail a disk
             int disk = atoi(&buffer[5]);
-            if (disk != -1)
+            if (disk != -1 && disk >= 0 && disk < info.numDisks)
             {
                 disk_array_fail_disk(da, disk);
             }
@@ -224,13 +248,14 @@ int main(int argc, char * argv[])
         {
             //recover a disk as blank
             int disk = atoi(&buffer[8]);
-            if (disk != -1 && disk > 0 && disk <= info.numDisks) //TODO: Could inline this to clean things up
+            if (disk != -1 && disk >= 0 && disk < info.numDisks) //TODO: Could inline this to clean things up
             {
                 disk_array_recover_disk(da, disk);
+                recover_f(disk);
             }
             else
             {
-                fprintf(stderr, "Invalid disk specified for failure!\n");
+                fprintf(stderr, "Invalid disk specified for recovery!\n");
             }
         }
 	else if (strncmp(buffer, "END", 3) == 0) {
@@ -246,6 +271,7 @@ int main(int argc, char * argv[])
     }    
     
     disk_array_print_stats(da);
+    if (knownval) free(knownval);
     
     fclose(tracef);
     free(tracefile);

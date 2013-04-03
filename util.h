@@ -8,6 +8,7 @@
 #include <string.h>
 #include "disk-array.h"
 
+#define BPS info.blocksPerStrip
 
 typedef struct _diskInfo {
     int numDisks;
@@ -16,3 +17,7 @@ typedef struct _diskInfo {
     int numStrips; //This is not provided; we calculate it.
     int level;
 } diskInfo;
+
+extern disk_array_t da;
+extern diskInfo info;
+
