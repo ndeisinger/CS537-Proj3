@@ -19,13 +19,13 @@ disk-array.o: disk-array.c
 	$(CC) $(FLAGS) disk-array.c -o disk-array.o
 	
 raid0.o: raid0.c
-	$(CC) $(FLAGS) raid0.c -o raid0.o
+	$(CC) $(FLAGS) raid0.c -O3 -o raid0.o
 
 raid10.o: raid10.c
-	$(CC) $(FLAGS) raid10.c -o raid10.o
+	$(CC) $(FLAGS) raid10.c -O3 -o raid10.o
 	
 raid4.o: raid4.c
-	$(CC) $(FLAGS) raid4.c -o raid4.o
+	$(CC) $(FLAGS) raid4.c -O3 -o raid4.o
 
 clean:
-	rm -f *.o raidsim
+	rm -f *.o raidsim virtual\ disk\ array-*

@@ -20,4 +20,4 @@ typedef struct _diskInfo {
 
 extern disk_array_t da;
 extern diskInfo info;
-
+extern int failedDisk;

@@ -1,0 +1,80 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.8	//
+BLOCK_SIZE	disk.h	10;"	d
+BPS	util.h	11;"	d
+CC	Makefile	/^CC=gcc$/;"	m
+DISK_ARRAY_H	disk-array.h	8;"	d
+DISK_H	disk.h	8;"	d
+FLAGS	Makefile	/^FLAGS=-c -ggdb3 --std=gnu99 -Wall -Werror$/;"	m
+MAX_BLOCKS	disk-array.h	14;"	d
+MAX_DISKS	disk-array.h	13;"	d
+NUM_DISKS	raid4.h	2;"	d
+NUM_OPS	test.c	44;"	d	file:
+OP_READ	test.c	45;"	d	file:
+OP_WRITE	test.c	46;"	d	file:
+PROB_FAIL	test.c	42;"	d	file:
+PROB_RECOVER	test.c	43;"	d	file:
+TAGS	Makefile	/^TAGS=ctags$/;"	m
+_diskInfo	util.h	/^typedef struct _diskInfo {$/;"	s
+block_size	disk.c	/^	int block_size;$/;"	m	struct:disk	file:
+block_xor	raid4.c	/^void block_xor(char * dst, char * oper)$/;"	f
+blocksPerDisk	util.h	/^    int blocksPerDisk;$/;"	m	struct:_diskInfo
+blocksPerStrip	util.h	/^    int blocksPerStrip;$/;"	m	struct:_diskInfo
+da	main.c	/^disk_array_t da; \/\/disk array$/;"	v
+disk	disk.c	/^struct disk {$/;"	s	file:
+diskInfo	util.h	/^} diskInfo;$/;"	t	typeref:struct:_diskInfo
+disk_array	disk-array.c	/^struct disk_array {$/;"	s	file:
+disk_array_close	disk-array.c	/^void disk_array_close( disk_array_t da )$/;"	f
+disk_array_create	disk-array.c	/^disk_array_t disk_array_create( const char *filename, $/;"	f
+disk_array_fail_disk	disk-array.c	/^int disk_array_fail_disk( disk_array_t da, int disk)$/;"	f
+disk_array_nblocks	disk-array.c	/^int disk_array_nblocks( disk_array_t da ) $/;"	f
+disk_array_ndisks	disk-array.c	/^int disk_array_ndisks( disk_array_t da )$/;"	f
+disk_array_print_stats	disk-array.c	/^void disk_array_print_stats( disk_array_t da)$/;"	f
+disk_array_read	disk-array.c	/^int disk_array_read( disk_array_t da, int disk, int block, char *data )$/;"	f
+disk_array_recover_disk	disk-array.c	/^int disk_array_recover_disk( disk_array_t da, int disk)$/;"	f
+disk_array_t	disk-array.h	/^typedef struct disk_array * disk_array_t;$/;"	t	typeref:struct:disk_array
+disk_array_write	disk-array.c	/^int disk_array_write( disk_array_t da, int disk, int block, const char *data )$/;"	f
+disk_close	disk.c	/^void disk_close( struct disk *d )$/;"	f
+disk_nblocks	disk.c	/^int disk_nblocks( struct disk *d )$/;"	f
+disk_open	disk.c	/^struct disk * disk_open( const char *diskname, int nblocks )$/;"	f
+disk_print_stats	disk.c	/^void disk_print_stats( struct disk * d)$/;"	f
+disk_read	disk.c	/^void disk_read( struct disk *d, int block, char *data )$/;"	f
+disk_write	disk.c	/^void disk_write( struct disk *d, int block, const char *data )$/;"	f
+disks	disk-array.c	/^  struct disk * disks[0];$/;"	m	struct:disk_array	typeref:struct:disk_array::disk	file:
+failedDisk	main.c	/^int failedDisk; \/\/Used in RAID4\/RAID5$/;"	v
+fd	disk.c	/^	int fd;$/;"	m	struct:disk	file:
+filename	disk-array.c	/^  char * filename;$/;"	m	struct:disk_array	file:
+info	main.c	/^diskInfo info; \/\/command line info$/;"	v
+level	util.h	/^    int level;$/;"	m	struct:_diskInfo
+localAdd_r0	raid0.h	/^static inline int localAdd_r0(int block)$/;"	f
+localAdd_r10	raid10.h	/^static inline int localAdd_r10(int block)$/;"	f
+localAdd_r4	raid4.h	/^static inline int localAdd_r4(int block)$/;"	f
+main	main.c	/^int main(int argc, char * argv[])$/;"	f
+main	test.c	/^int main( int argc, char *argv[] )$/;"	f
+nblocks	disk-array.c	/^  int nblocks;$/;"	m	struct:disk_array	file:
+nblocks	disk.c	/^	int nblocks;$/;"	m	struct:disk	file:
+ndisks	disk-array.c	/^  int ndisks;$/;"	m	struct:disk_array	file:
+nreads	disk.c	/^  int nreads;$/;"	m	struct:disk	file:
+numDisks	util.h	/^    int numDisks;$/;"	m	struct:_diskInfo
+numStrips	util.h	/^    int numStrips; \/\/This is not provided; we calculate it.$/;"	m	struct:_diskInfo
+nwrites	disk.c	/^  int nwrites;$/;"	m	struct:disk	file:
+print_par_buf	raid4.c	/^void print_par_buf(char buf[NUM_DISKS][BLOCK_SIZE * BPS])$/;"	f
+print_par_buf_b	main.c	/^void print_par_buf_b(char * buf2)$/;"	f
+r0_read	raid0.c	/^int r0_read(int block, int size, char * data)$/;"	f
+r0_recover	raid0.c	/^int r0_recover(int disk)$/;"	f
+r0_write	raid0.c	/^int r0_write(int block, int size, const char * data)$/;"	f
+r10_read	raid10.c	/^int r10_read(int block, int size, char * data)$/;"	f
+r10_recover	raid10.c	/^int r10_recover(int disk)$/;"	f
+r10_write	raid10.c	/^int r10_write(int block, int size, const char * data)$/;"	f
+r4_read	raid4.c	/^int r4_read(int block, int size, char * data)$/;"	f
+r4_recover	raid4.c	/^int r4_recover(int disk) {$/;"	f
+r4_write	raid4.c	/^int r4_write(int block, int size, const char * data)$/;"	f
+read_f	main.c	/^int (*read_f)(int, int, char *);$/;"	v
+recover_f	main.c	/^int (*recover_f)(int);$/;"	v
+verbose	main.c	/^int verbose;$/;"	v
+verbose	test.c	/^int verbose = 1;$/;"	v
+write_f	main.c	/^int (*write_f)(int, int, const char *);$/;"	v

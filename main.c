@@ -6,14 +6,29 @@
 int verbose;
 diskInfo info; //command line info
 disk_array_t da; //disk array
+int failedDisk; //Used in RAID4/RAID5
+//#define DEBUG 1
 
 //pointers to generic functions: set to specific functions depending on raid level
 int (*read_f)(int, int, char *);
 int (*write_f)(int, int, const char *);
 int (*recover_f)(int);
 
-
-#define DEBUG 1;
+void print_par_buf_b(char * buf2)
+{
+    char * buf =  buf2;
+printf("---------------------------------------------------------\n");
+    
+    for (int j = 0; j < BLOCK_SIZE * BPS; j++)
+    {
+        for (int i = 0; i < NUM_DISKS - 1; i++)
+        {
+            printf("[%x]", *(buf + (i * NUM_DISKS) + j));
+        }
+        printf("\n");
+    }
+printf("---------------------------------------------------------\n");
+}
 
 int main(int argc, char * argv[])
 {
@@ -169,16 +184,16 @@ int main(int argc, char * argv[])
     
     while (fgets(buffer, 200, tracef))
     {
-    #ifdef DEBUG
-        printf("Executing command: %s", buffer);
-    #endif
+        printf("%s", buffer);
         if (strncmp(buffer, "READ", 4) == 0)
         {
             //read data
             //TODO: Change this to strtok to match  below.
             int lba = atoi(&buffer[5]);
             int size = atoi(strrchr(buffer, ' ')); //This gets us the address of the last space, eg. the second number.
+            #ifdef DEBUG
             fprintf(stderr, "lba: %i, size: %i\n", lba, size);
+            #endif
             char readbuf[BLOCK_SIZE * size]; //TODO: Not efficient to repeatedly allocate/deallocate arrays.
             read_f(lba, size, readbuf);
             #ifdef DEBUG
@@ -187,12 +202,11 @@ int main(int argc, char * argv[])
                 {
                 if (knownval)
                 {
-                        if (knownval[i] != readbuf[i])
+                        if (knownval[i] != (readbuf[i]))
                         {
-                            printf("Diverging index: %i\n", i);
-                            printf("knownVal: %c\n", knownval[i]);
-                            printf("read val: %c\n", readbuf[i]);
-                            //exit(1);
+                             print_par_buf_b(knownval + i - 5);
+                             print_par_buf_b(readbuf + i - 5);
+                             exit(21);
                         }
                     }
                 }
@@ -238,6 +252,7 @@ int main(int argc, char * argv[])
             if (disk != -1 && disk >= 0 && disk < info.numDisks)
             {
                 disk_array_fail_disk(da, disk);
+                failedDisk = disk; //For RAID4/RAID5
             }
             else
             {
@@ -271,7 +286,9 @@ int main(int argc, char * argv[])
     }    
     
     disk_array_print_stats(da);
+    #ifdef DEBUG
     if (knownval) free(knownval);
+    #endif
     
     fclose(tracef);
     free(tracefile);

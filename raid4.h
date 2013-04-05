@@ -7,13 +7,13 @@ int r4_write(int block, int size, const char * data);
 
 int r4_recover(int disk); 
 
-static int failedDisk;
+void block_xor(char * dst, char * oper);
 
 static inline int localAdd_r4(int block)
 {
     int total = block;
     total /= BPS;
-    total /= ((NUM_DISKS - 1)/2);
+    total /= (NUM_DISKS - 1);
     total *= BPS; // This looks really redundant, but it works thanks to integer division.
     total += (block % BPS);
     return total;
